@@ -1,0 +1,152 @@
+﻿@page "/ingreso-material"
+@using YourNamespace.Models
+
+<h3>Ingreso de Material</h3>
+
+<select @onchange="OnTipoMaterialChanged">
+    <option value="revista">Revista</option>
+    <option value="libroElectronico">Libro Electrónico</option>
+</select>
+
+@if (tipoMaterial == "revista")
+{
+    <EditForm Model="@nuevaRevista" OnValidSubmit="@IngresarRevista">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label for="titulo">Título:</label>
+            <InputText id="titulo" @bind-Value="nuevaRevista.Titulo" /><br />
+
+            <label for="autor">Autor:</label>
+            <InputText id="autor" @bind-Value="nuevaRevista.Autor" /><br />
+
+            <label for="genero">Género:</label>
+            <InputText id="genero" @bind-Value="nuevaRevista.Genero" /><br />
+
+            <label for="anio">Año de Publicación:</label>
+            <InputNumber id="anio" @bind-Value="nuevaRevista.AnioPublicacion" /><br />
+
+            <button type="submit">Agregar Revista</button>
+        </div>
+    </EditForm>
+}
+else if (tipoMaterial == "libroElectronico")
+{
+    <EditForm Model="@nuevoLibroElectronico" OnValidSubmit="@IngresarLibroElectronico">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label for="titulo">Título:</label>
+            <InputText id="titulo" @bind-Value="nuevoLibroElectronico.Titulo" /><br />
+
+            <label for="autor">Autor:</label>
+            <InputText id="autor" @bind-Value="nuevoLibroElectronico.Autor" /><br />
+
+            <label for="genero">Género:</label>
+            <InputText id="genero" @bind-Value="nuevoLibroElectronico.Genero" /><br />
+
+            <label for="anio">Año de Publicación:</label>
+            <InputNumber id="anio" @bind-Value="nuevoLibroElectronico.AnioPublicacion" /><br />
+
+            
+            <button type="submit">Agregar Libro Electrónico</button>
+        </div>
+    </EditForm>
+}
+
+<h3>Listado de Materiales Ingresados</h3>
+<ul>
+    @foreach (var material in materiales)
+    {
+        <li>
+            @material.Titulo - @material.Autor - @material.Genero - @material.AnioPublicacion
+            <button @onclick="() => EditarMaterial(material)">Editar</button>
+            <button @onclick="() => EliminarMaterial(material)">Eliminar</button>
+        </li>
+    }
+</ul>
+
+@if (materialSeleccionado != null)
+{
+    <h3>Modificar Material</h3>
+    <EditForm Model="@materialSeleccionado" OnValidSubmit="@ModificarMaterial">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label for="tituloEdit">Título:</label>
+            <InputText id="tituloEdit" @bind-Value="materialSeleccionado.Titulo" /><br />
+
+            <label for="autorEdit">Autor:</label>
+            <InputText id="autorEdit" @bind-Value="materialSeleccionado.Autor" /><br />
+
+            <label for="generoEdit">Género:</label>
+            <InputText id="generoEdit" @bind-Value="materialSeleccionado.Genero" /><br />
+
+            <label for="anioEdit">Año de Publicación:</label>
+            <InputNumber id="anioEdit" @bind-Value="materialSeleccionado.AnioPublicacion" /><br />
+
+            @if (materialSeleccionado is Revista revista)
+            {
+                <!-- No hay campos adicionales para revistas en el formulario de modificación -->
+            }
+            else if (materialSeleccionado is LibroElectronico libroElectronico)
+            {
+                <label for="formatoEdit">Formato:</label>
+                <InputText id="formatoEdit" @bind-Value="libroElectronico.Formato" />
+
+                <br />
+
+                <label for="tamanoEdit">Tamaño del Archivo (MB):</label>
+                <InputNumber id="tamanoEdit" @bind-Value="libroElectronico.TamanoArchivo" />
+
+                <br />
+            }
+
+            <button type="submit">Modificar Material</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private string tipoMaterial = "revista";
+    private Revista nuevaRevista = new Revista();
+    private LibroElectronico nuevoLibroElectronico = new LibroElectronico();
+    private List<Material> materiales = new List<Material>();
+    private Material materialSeleccionado;
+
+    private void OnTipoMaterialChanged(ChangeEventArgs e)
+    {
+        tipoMaterial = e.Value.ToString();
+    }
+
+    private void IngresarRevista()
+    {
+        materiales.Add(nuevaRevista);
+        nuevaRevista = new Revista();
+    }
+
+    private void IngresarLibroElectronico()
+    {
+        materiales.Add(nuevoLibroElectronico);
+        nuevoLibroElectronico = new LibroElectronico();
+    }
+
+    private void EditarMaterial(Material material)
+    {
+        materialSeleccionado = material;
+    }
+
+    private void ModificarMaterial()
+    {
+        
+        materialSeleccionado = null;
+    }
+
+    private void EliminarMaterial(Material material)
+    {
+        materiales.Remove(material);
+    }
+}
